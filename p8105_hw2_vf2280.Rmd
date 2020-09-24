@@ -1,28 +1,56 @@
 ---
 title: "p8105_hw2_vf2280"
+author: "Vasili Fokaidis"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(tidyverse)
+library(readxl)
 ```
 
-## R Markdown
+## Problem 1
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Read the Mr. Trashwheel dataset.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+trashwheel_df =
+  read_xlsx("~/Desktop/p8105_hw2_vf2280/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+  sheet = "Mr. Trash Wheel",
+  range = cell_cols("A:N")) %>%
+  janitor::clean_names() %>%
+  drop_na(dumpster) %>%
+  mutate(
+    sports_balls = round(sports_balls),
+    sports_balls = as.integer(sports_balls)
+  )
 ```
 
-## Including Plots
+Read precipitation data! For 2018 and 2017
 
-You can also embed plots, for example:
+```{r}
+precip_2018 =
+  read_excel(
+    "~/Desktop/p8105_hw2_vf2280/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+    sheet = "2018 Precipitation",
+    skip = 1
+  ) %>%
+  janitor::clean_names() %>%
+  drop_na(month) %>%
+  mutate(year = 2018) %>%
+  relocate(year)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+precip_2017 =
+  read_excel(
+    "~/Desktop/p8105_hw2_vf2280/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+    sheet = "2017 Precipitation",
+    skip = 1
+  ) %>%
+  janitor::clean_names() %>%
+  drop_na(month) %>%
+  mutate(year = 2017) %>%
+  relocate(year)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+

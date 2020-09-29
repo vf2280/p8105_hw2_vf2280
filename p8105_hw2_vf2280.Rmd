@@ -25,7 +25,7 @@ trashwheel_df =
   read_xlsx(
           path = path_to_data,
           sheet = "Mr. Trash Wheel",
-          range = cell_cols("A:N"))%>%
+          range = cell_cols("A:N")) %>%
   janitor::clean_names() %>%
   drop_na(dumpster) %>%
   mutate(
@@ -76,4 +76,7 @@ precip_df =
         left_join(precip_df, month_df, by = "month")
 ```
 
+This dataset contains the information from the Mr. Trashwheel trash collector located in Balitmore, Maryland. When trash enters the inner harbor, Mr. Trashwheel collects and dispenses the trash into a dumpster. This dataset contains information on the year, month, and trash collected, such as sports balls, cigarettes, glass bottles, and more. There are `r nrow(trashwheel_df)` rows in the final trashwheel dataset and `r nrow(precip_df)` rows in the final precipitation dataset. There are also additional data sheets including month precipitation data. In this dataset:
 
+* The median number of sports balls found in a dumpster in 2017 was `r trashwheel_df %>% filter(year == 2017) %>% pull(sports_balls) %>% median()`
+* The total precipitation in 2018 was `r precip_df %>% filter(year == 2018) %>% pull(total) %>% sum()` inches

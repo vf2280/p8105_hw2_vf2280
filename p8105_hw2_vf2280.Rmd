@@ -11,7 +11,7 @@ library(readxl)
 
 ## Problem 1
 
-First, define a path to the dataset.
+First, define a path to the dataset. 
 
 ```{r}
 path_to_data = "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx"
@@ -59,5 +59,21 @@ precip_2017 =
   relocate(year)
 ```
 
+
+Now combine annual precipitation datasets and convert month to a character variable.
+
+```{r}
+month_df = 
+        tibble(
+                month = 1:12,
+                month_name = month.name
+        )
+
+precip_df = 
+        bind_rows(precip_2018, precip_2017)
+
+precip_df =
+        left_join(precip_df, month_df, by = "month")
+```
 
 

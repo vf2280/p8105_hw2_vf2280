@@ -100,5 +100,5 @@ nyc_transit_df =
                         NO = "FALSE"))
 ```
 
-This dataset shows the line, station name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance data in NYC Transit. So far, I have cleaned the variable names using `janitor` and I have selected specific columns from the larger dataset using `select`. Lastly, I changed the character values in the entry column to logical values using `recode`. In the cleaned dataset, there are `r distinct(nyc_transit_df, station_name, line)` distinct stations. There are `r count(nyc_transit_df, ada = TRUE)` stations that are ADA compliant. And, ANSWER THIS PART DONT FORGET!!!!!!!!!!
+This dataset shows the line, station name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance data in NYC Transit. So far, I have cleaned the variable names using `janitor` and I have selected specific columns from the larger dataset using `select`. Lastly, I changed the character values in the entry column to logical values using `recode`. In the cleaned dataset, there are `r count(distinct(nyc_transit_df, station_name, line))` distinct stations. There are `r sum(pull(nyc_transit_df, ada))` stations that are ADA compliant. And, ANSWER THIS PART DONT FORGET!!!!!!!!!!
 

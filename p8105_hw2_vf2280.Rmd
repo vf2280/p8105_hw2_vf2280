@@ -116,6 +116,22 @@ This dataset shows the line, station name, station latitude/longitude, routes se
 
 Reformat the data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
 
+```{r}
+reformat_transit_df=
+  mutate(nyc_transit_df,
+    route8 = as.character(route8),
+    route9 = as.character(route9),
+    route10 = as.character(route10),
+    route11 = as.character(route11)) %>%
+  pivot_longer(
+    route1:route11,
+    names_to = "route_number",
+    values_to = "route_name",
+    names_prefix = "route"
+  )
+```
+
+There are `r count(filter(reformat_transit_df, route_name == "A"))` distinct stations that serve the A train. Of these stations, `r count(filter(reformat_transit_df, route_name == "A", ada == TRUE))` are ADA compliant.
 
 ## Problem 3
 
@@ -156,16 +172,15 @@ snp_df =
     sep = "/",
     convert = TRUE
   ) %>%
-  mutate(month = month.name[month]) %>%
-  select(year, month, close)
+  mutate(month = month.name[month])
 ```
 
 
 For consistency across datasets, arrange according to year and month, and organize so that `year` and `month` are the leading columns.
 
 ```{r}
-head(arrange(snp_df, year, month), 787) %>%
-  select(year, month, day, close)
+  head(arrange(snp_df, year, month), 787) %>%
+  select(year, month, close)
 ```
 
 

@@ -93,40 +93,9 @@ Read NYC Transit dataset. Retain line, station name, station latitude/longitude,
 ```{r}
 nyc_transit_df =
               read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
-  janitor::clean_names()
-                       col_types = cols(
-                         division = col_character(),
-                           line = col_character(),
-                           station_name = col_character(),
-                           station_latitude = col_double(),
-                           station_longitude = col_double(),
-                           route1 = col_character(),
-                           route2 = col_character(),
-                           route3 = col_character(),
-                           route4 = col_character(),
-                           route5 = col_character(),
-                           route6 = col_character(),
-                           route7 = col_character(),
-                           route8 = col_double(),
-                           route9 = col_double(),
-                           route10 = col_double(),
-                           route11 = col_double(),
-                           entrance_type = col_character(),
-                           entry = col_character(),
-                           exit_only = col_character(),
-                           vending = col_character(),
-                           staffing = col_character(),
-                           ada = col_logical(),
-                           ada_notes = col_character(),
-                           free_crossover = col_logical(),
-                           north_south_street = col_character(),
-                           east_west_street = col_character(),
-                           corner = col_character(),
-                           entrance_latitude = col_double(),
-                           entrance_latitude = col_double(),
-                           station_location = col_character(),
-                           entrance_location = col_character()
-                           )
-select(nyc_transit_df, line:route11, entry, vending, entrance_type, ada)
-              )
+  janitor::clean_names() %>%
+  select(line, station_name, station_latitude, station_longitude, 6:16, entry, vending, entrance_type, ada) %>%
+  mutate(entry = recode(entry,
+                        YES = "TRUE",
+                        NO = "FALSE"))
 ```

@@ -95,13 +95,23 @@ Read NYC Transit dataset. Retain line, station name, station latitude/longitude,
 nyc_transit_df =
               read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
   janitor::clean_names() %>%
-  select(line, station_name, station_latitude, station_longitude, 6:16, entry, vending, entrance_type, ada) %>%
+  select(
+    line, 
+    station_name,
+    station_latitude,
+    station_longitude,
+    6:16,
+    entry,
+    vending,
+    entrance_type,
+    ada) %>%
   mutate(entry = recode(entry,
                         YES = "TRUE",
-                        NO = "FALSE"))
+                        NO = "FALSE")) 
 ```
 
 This dataset shows the line, station name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance data in NYC Transit. So far, I have cleaned the variable names using `janitor` and I have selected specific columns from the larger dataset using `select`. Lastly, I changed the character values in the entry column to logical values using `recode`. In the cleaned dataset, there are `r count(distinct(nyc_transit_df, station_name, line))` distinct stations. There are `r sum(pull(nyc_transit_df, ada))` stations that are ADA compliant. And, ANSWER THIS PART DONT FORGET!!!!!!!!!!
+
 
 
 Reformat the data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
@@ -109,25 +119,17 @@ Reformat the data so that route number and route name are distinct variables. Ho
 
 ## Problem 3
 
-First, clean the data in pols-month.csv.
+First, clean the data in pols-month.csv and convert month number into month name.
 
 ```{r}
 pols_month_df =
     read_csv("./data/pols-month.csv") %>%
-  separate(mon, c('year', 'month', 'day'), sep = "-")
-```
-
-
-Convert month number into month name. (THIS ISNT WORKING)
-
-```{r}
-month_df = 
-        tibble(
-                month = 1:12,
-                month_name = month.name
-        )
-pols_month_df=
-  left_join(pols_month_df, month_df, by = "month")
+  separate(
+    mon, 
+    into = c('year', 'month', 'day'),
+    convert = TRUE
+  ) %>%
+  mutate(month = month.name[month])
 ```
 
 
@@ -143,26 +145,19 @@ mutate(pols_month_df,
 ```
 
 
-Second, clean the data in snp.csv using similar process to the above.
+Second, clean the data in snp.csv using similar process to the above. And, convert month number into month name.
 
 ```{r}
-snp_df =
-  read_csv("./data/snp.csv") %>%
-  separate(date, c('month', 'day', 'year'))
-```
-
-
-Convert month number into month name. SAME PROBLEM FIX IT!!!
-
-```{r}
-month_df =
-  tibble(
-    month = 1:12,
-    month_name = month.name
-  )
-
 snp_df = 
-  left_join(snp_df, month_df, by = "month")
+  read_csv("./data/snp.csv") %>%
+  separate(
+    date,
+    into = c("month", "day", "year"),
+    sep = "/",
+    convert = TRUE
+  ) %>%
+  mutate(month = month.name[month]) %>%
+  select(year, month, close)
 ```
 
 
@@ -173,4 +168,17 @@ head(arrange(snp_df, year, month), 787) %>%
   select(year, month, day, close)
 ```
 
+
+Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from "wide" to "long" format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
+
+```{r}
+unemployment_df =
+  read_csv("./data/unemployment.csv") %>%
+janitor::clean_names() %>%
+pivot_longer(
+  jan:dec,
+  names_to = "month", 
+  values_to = "unemployment_rate"
+)
+```
 

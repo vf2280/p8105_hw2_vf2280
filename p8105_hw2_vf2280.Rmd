@@ -86,6 +86,7 @@ This dataset contains the information from the Mr. Trashwheel trash collector lo
 
 ```{r}
 library(readr)
+library(dplyr)
 ```
 
 Read NYC Transit dataset. Retain line, station name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance.
@@ -101,4 +102,75 @@ nyc_transit_df =
 ```
 
 This dataset shows the line, station name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance data in NYC Transit. So far, I have cleaned the variable names using `janitor` and I have selected specific columns from the larger dataset using `select`. Lastly, I changed the character values in the entry column to logical values using `recode`. In the cleaned dataset, there are `r count(distinct(nyc_transit_df, station_name, line))` distinct stations. There are `r sum(pull(nyc_transit_df, ada))` stations that are ADA compliant. And, ANSWER THIS PART DONT FORGET!!!!!!!!!!
+
+
+Reformat the data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
+
+
+## Problem 3
+
+First, clean the data in pols-month.csv.
+
+```{r}
+pols_month_df =
+    read_csv("./data/pols-month.csv") %>%
+  separate(mon, c('year', 'month', 'day'), sep = "-")
+```
+
+
+Convert month number into month name. (THIS ISNT WORKING)
+
+```{r}
+month_df = 
+        tibble(
+                month = 1:12,
+                month_name = month.name
+        )
+pols_month_df=
+  left_join(pols_month_df, month_df, by = "month")
+```
+
+
+Create a `president` variable taking values `gop` and `dem` and remove `prez_dem` and `prez_gop`, and remove the day variable.
+
+```{r}
+mutate(pols_month_df,
+       president = case_when(
+         prez_gop == 1 ~ 'gop',
+         prez_dem == 1 ~ 'dem'
+       )) %>%
+  select(-prez_gop, -prez_dem, -day)
+```
+
+
+Second, clean the data in snp.csv using similar process to the above.
+
+```{r}
+snp_df =
+  read_csv("./data/snp.csv") %>%
+  separate(date, c('month', 'day', 'year'))
+```
+
+
+Convert month number into month name. SAME PROBLEM FIX IT!!!
+
+```{r}
+month_df =
+  tibble(
+    month = 1:12,
+    month_name = month.name
+  )
+
+snp_df = 
+  left_join(snp_df, month_df, by = "month")
+```
+
+
+For consistency across datasets, arrange according to year and month, and organize so that `year` and `month` are the leading columns.
+
+```{r}
+head(arrange(snp_df, year, month), 787) %>%
+  select(year, month, day, close)
+```
+
 

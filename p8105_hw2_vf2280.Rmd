@@ -145,19 +145,20 @@ pols_month_df =
     into = c('year', 'month', 'day'),
     convert = TRUE
   ) %>%
-  mutate(month = month.name[month])
+  mutate(month = month.abb[month])
 ```
 
 
 Create a `president` variable taking values `gop` and `dem` and remove `prez_dem` and `prez_gop`, and remove the day variable.
 
 ```{r}
+pols_month_df = 
 mutate(pols_month_df,
        president = case_when(
          prez_gop == 1 ~ 'gop',
          prez_dem == 1 ~ 'dem'
        )) %>%
-  select(-prez_gop, -prez_dem, -day)
+  select(-c(prez_gop, prez_dem, day))
 ```
 
 
@@ -172,13 +173,15 @@ snp_df =
     sep = "/",
     convert = TRUE
   ) %>%
-  mutate(month = month.name[month])
+  select(-c(day)) %>%
+  mutate(month = month.abb[month])
 ```
 
 
 For consistency across datasets, arrange according to year and month, and organize so that `year` and `month` are the leading columns.
 
 ```{r}
+snp_df =
   head(arrange(snp_df, year, month), 787) %>%
   select(year, month, close)
 ```
@@ -189,11 +192,22 @@ Third, tidy the unemployment data so that it can be merged with the previous dat
 ```{r}
 unemployment_df =
   read_csv("./data/unemployment.csv") %>%
-janitor::clean_names() %>%
 pivot_longer(
-  jan:dec,
+  Jan:Dec,
   names_to = "month", 
-  values_to = "unemployment_rate"
-)
+  values_to = "unemployment_rate") %>%
+  janitor::clean_names()
 ```
 
+
+Join the datasets by merging snp into pols, and merging unemployment into the result.
+
+```{r}
+pols_snp_joined_df = 
+  left_join(pols_month_df, snp_df)
+
+pols_snp_unemployment_joined_df =
+  left_join(pols_snp_joined_df, unemployment_df)
+```
+
+The joined dataset has merged year, and month data. It has also added the non-shared data from the three individual datasets. The joined dataset has `r nrow(pols_snp_unemployment_joined_df)` rows and `r ncol(pols_snp_unemployment_joined_df)` columns. The dataset has years ranging from `r min(pull(pols_snp_unemployment_joined_df, year))` to `r max(pull(pols_snp_unemployment_joined_df, year))`. Some important variables in the joined dataset are unemployment rate, presidential party (under variable president), and number of republican and democratic governors, senators, and representatives.
